@@ -1,3 +1,4 @@
+import { authRoutes } from "@/constants/routes";
 import { auth } from "@/lib/auth/auth";
 import { redirect } from "next/navigation";
 import { ReactNode } from "react";
@@ -14,7 +15,7 @@ export default async function PrivateRoutesLayout({
     !session.user ||
     session.error === "RefreshAccessTokenError"
   ) {
-    redirect("/auth/login");
+    redirect(authRoutes.LOGIN);
   }
 
   return <> {children}</>;
