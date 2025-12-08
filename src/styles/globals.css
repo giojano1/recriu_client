@@ -120,6 +120,33 @@
     @apply bg-background text-foreground;
     font-family: var(--font-inter) !important;
   }
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: inherit !important;
+    -webkit-text-size-adjust: 100% !important;
+    transition: background-color 5000s ease-in-out 0s !important;
+    box-shadow: inset 0 0 0px 0px transparent !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    font-family: inherit !important;
+    caret-color: inherit !important;
+  }
+
+  /* Light mode autofill */
+  input:-webkit-autofill {
+    box-shadow: 0 0 0 0px white inset !important;
+  }
+
+  /* Dark mode autofill */
+  .dark input:-webkit-autofill,
+  .dark input:-webkit-autofill:hover,
+  .dark input:-webkit-autofill:focus,
+  .dark input:-webkit-autofill:active {
+    box-shadow: 0 0 0 0px rgb(255 255 255 / 0) inset !important;
+  }
 }
 /* media */
 @custom-variant max-1920 (@media (max-width: 1920px));

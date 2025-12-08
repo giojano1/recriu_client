@@ -1,4 +1,3 @@
-import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 import React from "react";
 
@@ -7,13 +6,7 @@ export default function AuthPageWrapper({
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <Card>
-      <CardContent className="flex w-full flex-col gap-6 ">
-        {children}
-      </CardContent>
-    </Card>
-  );
+  return <section className="flex w-full flex-col gap-6">{children}</section>;
 }
 
 AuthPageWrapper.Header = function Header({
@@ -25,8 +18,12 @@ AuthPageWrapper.Header = function Header({
 }) {
   return (
     <div className="flex flex-col items-center gap-1 text-center">
-      <h2 className="text-xl leading-none font-semibold ">{title}</h2>
-      {subtitle && <p className="text-muted-foreground text-sm">{subtitle}</p>}
+      <h2 className="text-2xl font-bold ">{title}</h2>
+      {subtitle && (
+        <p className="text-muted-foreground text-sm text-balanced">
+          {subtitle}
+        </p>
+      )}
     </div>
   );
 };
