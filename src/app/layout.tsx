@@ -1,7 +1,9 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/utils";
+import { QueryProvider, ThemeProvider } from "@/providers";
 import "@/styles/globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { Toaster } from "sonner";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -36,7 +38,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={cn(inter.variable, "antialiased")}>{children}</body>
+      <body className={cn(inter.variable, "antialiased")}>
+        <QueryProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="light"
+            enableSystem={false}
+          >
+            <main>{children}</main>
+            <Toaster />
+          </ThemeProvider>
+        </QueryProvider>
+      </body>
     </html>
   );
 }

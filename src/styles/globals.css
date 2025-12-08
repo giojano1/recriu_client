@@ -118,5 +118,56 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-inter) !important;
   }
+}
+/* media */
+@custom-variant max-1920 (@media (max-width: 1920px));
+@custom-variant max-1500 (@media (max-width: 1500px));
+@custom-variant max-1400 (@media (max-width: 1400px));
+@custom-variant max-1350 (@media (max-width: 1350px));
+@custom-variant max-1300 (@media (max-width: 1300px));
+@custom-variant max-1250 (@media (max-width: 1250px));
+@custom-variant max-1200 (@media (max-width: 1200px));
+@custom-variant max-1150 (@media (max-width: 1150px));
+@custom-variant max-1100 (@media (max-width: 1100px));
+@custom-variant max-1050 (@media (max-width: 1050px));
+@custom-variant max-1000 (@media (max-width: 1000px));
+@custom-variant max-950 (@media (max-width: 950px));
+@custom-variant max-900 (@media (max-width: 900px));
+@custom-variant max-850 (@media (max-width: 850px));
+@custom-variant max-800 (@media (max-width: 800px));
+@custom-variant max-750 (@media (max-width: 750px));
+@custom-variant max-700 (@media (max-width: 700px));
+@custom-variant max-650 (@media (max-width: 650px));
+@custom-variant max-600 (@media (max-width: 600px));
+@custom-variant max-550 (@media (max-width: 550px));
+@custom-variant max-500 (@media (max-width: 500px));
+@custom-variant max-450 (@media (max-width: 450px));
+@custom-variant max-400 (@media (max-width: 400px));
+@custom-variant max-350 (@media (max-width: 350px));
+/* custom colors */
+@theme {
+  --color-success-dark: #0ba259;
+  --color-success-base: #0caf60;
+  --color-success-light: #55c790;
+  --color-warning-dark: #e6bb20;
+  --color-warning-base: #ffd023;
+  --color-warning-light: #ffde65;
+  --color-error-dark: #c02337;
+  --color-error-base: #e03137;
+  --color-error-light: #ffedec;
+  --color-custom-orange: #fe964a;
+  --color-custom-blue: #2f78ee;
+  --color-custom-purple: #8c62ff;
+  --color-grey-1000: #111111;
+  --color-grey-900: #1e1e1e;
+  --color-grey-800: #2c2c2c;
+  --color-grey-700: #383838;
+  --color-grey-600: #444444;
+  --color-grey-500: #757575;
+  --color-grey-400: #b3b3b3;
+  --color-grey-300: #d9d9d9;
+  --color-grey-200: #e6e6e6;
+  --color-grey-100: #f5f5f5;
 }
