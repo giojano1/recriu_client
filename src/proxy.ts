@@ -1,13 +1,15 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { auth } from "@/lib/auth/auth";
+import { authRoutes, companyRoutes, dashboardRoutes } from "./constants/routes";
+import { AUTH_COOKIE_CONFIG } from "./features/auth/utils/auth.config";
 
 const ROUTE_CONFIG = {
   // Routes that require authentication
   PROTECTED_ROUTES: ["/dashboard"] as const,
 
   // Routes that should redirect to dashboard if already authenticated
-  AUTH_ROUTES: ["/auth/login", "/auth/register"] as const,
+  AUTH_ROUTES: Object.values(authRoutes),
 
   // Company routes - users with company should not access these
   COMPANY_ROUTES: ["/company"] as const,
@@ -16,14 +18,14 @@ const ROUTE_CONFIG = {
   TWO_FA_ROUTE: "/auth/login/2fa",
 
   // Default redirect destinations
-  DEFAULT_LOGIN_REDIRECT: "/dashboard", // Where to go after successful login
-  DEFAULT_LOGOUT_REDIRECT: "/auth/login", // Where to go when not authenticated
-  COMPANY_CREATE_REDIRECT: "/dashboard/create-company", // Where to go for company creation
+  DEFAULT_LOGIN_REDIRECT: dashboardRoutes.DASHBOARD, // Where to go after successful login
+  DEFAULT_LOGOUT_REDIRECT: authRoutes.LOGIN, // Where to go when not authenticated
+  COMPANY_CREATE_REDIRECT: companyRoutes.CREATE, // Where to go for company creation
 } as const;
 
 const COOKIE_NAMES = {
-  SESSION_TOKEN: "next-auth.session-token",
-  CALLBACK_URL: "next-auth.callback-url",
+  SESSION_TOKEN: AUTH_COOKIE_CONFIG.SESSION_COOKIE_NAME,
+  CALLBACK_URL: AUTH_COOKIE_CONFIG.CALLBACK_URL_COOKIE_NAME,
 } as const;
 
 /**
