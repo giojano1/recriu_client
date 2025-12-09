@@ -242,7 +242,27 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   ],
 
   callbacks: {
-    async jwt({ token, user, account }) {
+    async jwt({ token, user, account, trigger, session }) {
+      // Handle session update from client (triggered by update() call)
+      if (trigger === "update" && session) {
+        logger.info("JWT callback: Session update triggered from client", {
+          action: "jwt_client_update",
+        });
+
+        // Client called update() with new tokens
+        if (session.accessToken) {
+          return {
+            ...token,
+            accessToken: session.accessToken,
+            refreshToken: session.refreshToken || token.refreshToken,
+            accessTokenExpiry:
+              session.accessTokenExpiry ||
+              Date.now() + AUTH_COOKIE_CONFIG.ACCESS_TOKEN_MAX_AGE * 1000,
+            error: undefined, // Clear any previous errors
+          };
+        }
+      }
+
       // Initial sign in - user object is available
       if (account && user) {
         logger.info("JWT callback: Initial sign in", {
@@ -339,6 +359,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           },
           accessToken: token.accessToken,
           refreshToken: token.refreshToken,
+          accessTokenExpiry: token.accessTokenExpiry,
           companyId: token.companyId,
           role: token.role,
         };

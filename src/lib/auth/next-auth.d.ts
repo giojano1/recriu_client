@@ -16,6 +16,7 @@ declare module "next-auth" {
     } & DefaultSession["user"];
     accessToken?: string;
     refreshToken?: string;
+    accessTokenExpiry?: number;
     companyId?: string | null;
     role?: string;
     error?: "RefreshAccessTokenError";
