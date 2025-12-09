@@ -1,5 +1,5 @@
 export const AUTH_COOKIE_CONFIG = {
-  ACCESS_TOKEN_MAX_AGE: 60 * 30, // 30 minutes
+  ACCESS_TOKEN_MAX_AGE: 60 * 30, // 30 minute
   REFRESH_TOKEN_MAX_AGE: 60 * 60 * 24 * 30, // 30 days
 
   SELECTED_COMPANY_MAX_AGE: 60 * 60 * 24 * 30,

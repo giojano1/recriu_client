@@ -1,10 +1,12 @@
 import { env } from "@/config/env";
 import { auth } from "@/lib/auth/auth";
 import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
+import { logger } from "@/lib/utils/logger";
 
 interface RetryConfig extends InternalAxiosRequestConfig {
   retryCount?: number;
   _retryStartTime?: number;
+  _isRetryAfter401?: boolean;
 }
 
 const ServerAPI = axios.create({
@@ -13,7 +15,7 @@ const ServerAPI = axios.create({
     "Content-Type": "application/json",
     "x-api-key": env.API_KEY,
   },
-  timeout: 10000, // 10 second timeout
+  timeout: 10000,
 });
 
 // Request interceptor
@@ -23,6 +25,7 @@ ServerAPI.interceptors.request.use(
       if (config.headers.Authorization) {
         return config;
       }
+
       const session = await auth();
 
       if (session?.accessToken) {
@@ -42,7 +45,6 @@ const MAX_RETRIES = 3;
 const RETRY_DELAY = 1000;
 const MAX_RETRY_DELAY = 10000;
 
-// Helper to determine if request should be retried
 function shouldRetry(error: AxiosError, config: RetryConfig): boolean {
   if (config.headers?.["X-No-Retry"]) {
     return false;
@@ -65,7 +67,6 @@ function shouldRetry(error: AxiosError, config: RetryConfig): boolean {
     return retryableErrors.includes(error.code);
   }
 
-  // Retry on specific 5xx server errors
   if (error.response?.status) {
     const retryableStatuses = [500, 502, 503, 504];
     return retryableStatuses.includes(error.response.status);
@@ -74,7 +75,6 @@ function shouldRetry(error: AxiosError, config: RetryConfig): boolean {
   return false;
 }
 
-// Helper for exponential backoff with jitter
 function getRetryDelay(retryCount: number): number {
   const exponentialDelay = RETRY_DELAY * Math.pow(2, retryCount);
   const cappedDelay = Math.min(exponentialDelay, MAX_RETRY_DELAY);
@@ -82,12 +82,64 @@ function getRetryDelay(retryCount: number): number {
   return cappedDelay + jitter;
 }
 
-// Helper to check if request is to refresh endpoint (prevent circular refresh)
 function isRefreshEndpoint(config: RetryConfig): boolean {
   return config.url?.includes("/auth/refresh") || false;
 }
 
-// Response interceptor for error handling and retries
+// NEW: Helper to manually refresh the session
+async function refreshSession(): Promise<string | null> {
+  try {
+    logger.info("Manually triggering token refresh", {
+      action: "manual_token_refresh",
+    });
+
+    // Get current session to extract refresh token
+    const currentSession = await auth();
+
+    if (!currentSession?.refreshToken) {
+      logger.error("No refresh token available for manual refresh", {
+        action: "manual_token_refresh_failed",
+      });
+      return null;
+    }
+
+    // Call refresh endpoint directly
+    const response = await axios.post(
+      `${env.API_URL}/auth/refresh`,
+      {},
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": env.API_KEY,
+          Cookie: `refreshToken=${currentSession.refreshToken}`,
+          "X-Server-Refresh": "true",
+        },
+        timeout: 10000,
+      }
+    );
+
+    if (!response.data?.tokens?.accessToken) {
+      logger.error("Invalid refresh response", {
+        action: "manual_token_refresh_failed",
+      });
+      return null;
+    }
+
+    logger.info("Token refreshed successfully", {
+      action: "manual_token_refresh_success",
+    });
+
+    return response.data.tokens.accessToken;
+  } catch (error) {
+    logger.error("Failed to manually refresh token", {
+      action: "manual_token_refresh_failed",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+    return null;
+  }
+}
+
+// Response interceptor
 ServerAPI.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
@@ -97,24 +149,49 @@ ServerAPI.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    // Initialize retry count and start time
+    // Initialize retry tracking
     if (config.retryCount === undefined) {
       config.retryCount = 0;
       config._retryStartTime = Date.now();
     }
 
+    // Handle 401 errors (token expired)
     if (
       error.response?.status === 401 &&
       !isRefreshEndpoint(config) &&
-      !config.headers?.["X-No-Retry"]
+      !config.headers?.["X-No-Retry"] &&
+      !config._isRetryAfter401 // Prevent infinite loops
     ) {
-      // Log for debugging
-      if (process.env.NODE_ENV === "development") {
-        console.warn("[Server API] 401 Unauthorized - Token may have expired");
+      logger.info("Received 401, attempting token refresh", {
+        action: "server_api_401_refresh",
+      });
+
+      // Try to refresh the token
+      const newAccessToken = await refreshSession();
+
+      if (newAccessToken) {
+        // Mark this as a retry after 401 to prevent infinite loops
+        config._isRetryAfter401 = true;
+
+        // Update the Authorization header with new token
+        config.headers.Authorization = `Bearer ${newAccessToken}`;
+
+        logger.info("Retrying request with new token", {
+          action: "server_api_retry_with_new_token",
+        });
+
+        // Retry the request with new token
+        return ServerAPI(config);
+      } else {
+        logger.error("Token refresh failed, cannot retry request", {
+          action: "server_api_refresh_failed",
+        });
+        // Return 401 error to trigger sign out in client
+        return Promise.reject(error);
       }
     }
 
-    // Log server-side API errors (structured logging)
+    // Log errors in development
     if (process.env.NODE_ENV === "development") {
       console.error("[Server API Error]", {
         url: config.url,
@@ -130,11 +207,10 @@ ServerAPI.interceptors.response.use(
       });
     }
 
-    // Check if we should retry
+    // Check if we should retry (for other errors)
     if (config.retryCount < MAX_RETRIES && shouldRetry(error, config)) {
       config.retryCount += 1;
 
-      // Wait with exponential backoff + jitter
       const delay = getRetryDelay(config.retryCount);
       await new Promise((resolve) => setTimeout(resolve, delay));
 
@@ -147,11 +223,10 @@ ServerAPI.interceptors.response.use(
         );
       }
 
-      // Retry the request
       return ServerAPI(config);
     }
 
-    // All retries exhausted or non-retryable error
+    // All retries exhausted
     if (config.retryCount >= MAX_RETRIES) {
       console.error(
         `[Server API] Max retries (${MAX_RETRIES}) exhausted for:`,
