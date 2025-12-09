@@ -13,7 +13,6 @@ import type { JWT } from "next-auth/jwt";
 
 async function refreshAccessToken(token: JWT): Promise<JWT> {
   try {
-    // Validate refresh token exists
     if (!token.refreshToken) {
       logger.error("No refresh token available", {
         action: "token_refresh_failed",
@@ -29,7 +28,6 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
       action: "token_refresh_attempt",
     });
 
-    // Call the NestJS refresh endpoint with refreshToken in cookie
     const response = await axios.post(
       `${env.API_URL}/auth/refresh`,
       {},
@@ -44,7 +42,6 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
       }
     );
 
-    // Validate response structure
     if (!response.data?.tokens?.accessToken) {
       logger.error("Invalid refresh response structure", {
         action: "token_refresh_failed",
@@ -58,7 +55,6 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
 
     const { accessToken } = response.data.tokens;
 
-    // Check if backend rotated the refreshToken (in Set-Cookie header)
     const setCookieHeader = response.headers["set-cookie"];
     let newRefreshToken = token.refreshToken;
 
@@ -102,14 +98,12 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
   } catch (error) {
     const metadata: Record<string, unknown> = {};
 
-    // Add axios-specific error details
     if (axios.isAxiosError(error)) {
       metadata.status = error.response?.status;
       metadata.statusText = error.response?.statusText;
       metadata.code = error.code;
       metadata.url = error.config?.url;
 
-      // Log response data if available (but sanitize it)
       if (error.response?.data) {
         metadata.responseData = JSON.stringify(error.response.data);
       }
@@ -150,7 +144,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             action: "authorize_attempt",
           });
 
-          // Call the NestJS login endpoint
           const response = await ServerAPI.post<
             LoginResponse | TwoFactorRequiredResponse
           >("/auth/login", {
@@ -158,13 +151,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             password: credentials.password,
           });
 
-          // Handle 2FA required response
           if ("requires2FA" in response.data && response.data.requires2FA) {
             logger.info("2FA required for user", {
               action: "authorize_2fa_required",
             });
 
-            // Return a special user object indicating 2FA is required
             return {
               id: "2fa-pending",
               email: credentials.email as string,
@@ -182,10 +173,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             };
           }
 
-          // Handle standard login success
           const loginData = response.data as LoginResponse;
 
-          // Extract refreshToken from Set-Cookie header
           const setCookieHeader = response.headers["set-cookie"];
           let refreshToken = "";
 
@@ -197,7 +186,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 cookie.startsWith("refreshToken=")
               );
             } else {
-              // setCookieHeader is a string
               const cookieStr = setCookieHeader as string;
               refreshTokenCookie = cookieStr.startsWith("refreshToken=")
                 ? cookieStr
@@ -243,13 +231,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
   callbacks: {
     async jwt({ token, user, account, trigger, session }) {
-      // Handle session update from client (triggered by update() call)
       if (trigger === "update" && session) {
         logger.info("JWT callback: Session update triggered from client", {
           action: "jwt_client_update",
         });
 
-        // Client called update() with new tokens
         if (session.accessToken) {
           return {
             ...token,
@@ -258,21 +244,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             accessTokenExpiry:
               session.accessTokenExpiry ||
               Date.now() + AUTH_COOKIE_CONFIG.ACCESS_TOKEN_MAX_AGE * 1000,
-            error: undefined, // Clear any previous errors
+            error: undefined,
           };
         }
       }
 
-      // Initial sign in - user object is available
       if (account && user) {
         logger.info("JWT callback: Initial sign in", {
           action: "jwt_initial_signin",
           userId: user.id,
         });
 
-        // Check if 2FA is required
         if (user.requires2FA) {
-          // Don't create a full session for 2FA pending state
           return {
             ...token,
             requires2FA: true,
@@ -300,21 +283,23 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         };
       }
 
-      // Return previous token if the access token has not expired yet
+      // IMPORTANT: Check token expiry with buffer
+      // Refresh tokens proactively 30 seconds before they expire
       const expiryTime = token.accessTokenExpiry as number | undefined;
-      if (expiryTime && Date.now() < expiryTime) {
+      const REFRESH_BUFFER = 30 * 1000; // 30 seconds
+
+      if (expiryTime && Date.now() < expiryTime - REFRESH_BUFFER) {
         return token;
       }
 
-      // Access token has expired, try to refresh it
-      logger.info("JWT callback: Token expired, refreshing", {
+      logger.info("JWT callback: Token expired or expiring soon, refreshing", {
         action: "jwt_token_expired",
       });
+
       return await refreshAccessToken(token);
     },
 
     async session({ session, token }) {
-      // Handle 2FA pending state
       if (token.requires2FA) {
         return {
           ...session,
@@ -337,7 +322,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         };
       }
 
-      // Handle refresh error
       if (token.error === "RefreshAccessTokenError") {
         logger.warn("Session callback: Refresh token error", {
           action: "session_refresh_error",
@@ -348,8 +332,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         };
       }
 
-      // Return normal session with user data and tokens
-      // Ensure user is always defined with fallback values
       if (token.user) {
         return {
           ...session,
@@ -365,7 +347,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         };
       }
 
-      // Fallback if no user in token (shouldn't happen in normal flow)
       return session;
     },
   },
