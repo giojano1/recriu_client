@@ -1,5 +1,5 @@
 import AuthPageWrapper from "@/features/auth/shared/components/page-wrapper";
-import ForgotPasswordForm from "@/features/auth/password/forgot/forgot-password-form";
+import ForgotPasswordForm from "@/features/auth/password/forgot/forgot-password.form";
 import { authRoutes } from "@/constants/routes";
 import { Metadata } from "next";
 
