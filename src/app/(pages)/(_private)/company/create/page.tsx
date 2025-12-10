@@ -29,7 +29,7 @@ export default async function page() {
   return (
     <div className="flex h-svh flex-col">
       <CreateCompanyHeader />
-      <div className="mx-auto flex max-h-[700px] min-h-0 w-full max-w-[1440px] flex-1 justify-between gap-12 px-4 py-6 md:p-10">
+      <div className="max-1100:gap-8 max-950:flex-col mx-auto flex h-full max-h-[700px] min-h-0 w-full max-w-[1240px] flex-1 justify-between gap-12 px-4 py-6 md:p-10">
         <CreateCompanyPageTitle />
         <CreateCompanyForm />
       </div>
