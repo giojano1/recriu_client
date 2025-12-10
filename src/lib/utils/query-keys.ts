@@ -8,6 +8,7 @@ export const queryKeys = {
   // Company-related queries (for future use)
   company: {
     all: ["company"] as const,
+    current: () => [...queryKeys.company.all, "current"] as const,
     detail: (id: string) => [...queryKeys.company.all, "detail", id] as const,
   },
 

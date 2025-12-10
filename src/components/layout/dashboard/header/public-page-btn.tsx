@@ -4,9 +4,11 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Copy } from "lucide-react";
 import { toast } from "sonner";
+import { useGetCurrentCompany } from "@/features/company/get-current-company";
 
 export default function PublicPageBtn({ className }: { className?: string }) {
   const [disabled, setDisabled] = useState(false);
+  const { data, isLoading, error } = useGetCurrentCompany();
 
   const handleCopy = async () => {
     if (disabled) return;
@@ -20,6 +22,9 @@ export default function PublicPageBtn({ className }: { className?: string }) {
     toast.success("Public page URL copied to clipboard!");
   };
 
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error loading company</div>;
+  if (!data) return null;
   return (
     <Button
       size="sm"
@@ -30,7 +35,7 @@ export default function PublicPageBtn({ className }: { className?: string }) {
     >
       <div className="mt-0.5 -mr-0.5 size-2 rounded-full bg-green-500" />
       <span className="max-w-[130px] truncate text-[12px] font-bold">
-        recriu.com/app_name
+        recriu.com/{data.company.slug}
       </span>
       <Copy className="size-3.5" />
     </Button>

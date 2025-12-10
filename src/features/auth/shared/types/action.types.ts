@@ -176,3 +176,37 @@ export type RefreshTokenResult =
       success: false;
       error: string;
     };
+
+// Backend API response type (full response from /companies/me)
+export type GetCurrentCompanyBackendResponse = {
+  success: true;
+  data: {
+    company: {
+      id: string;
+      name: string;
+      slug: string;
+      size:
+        | "SMALL_11_50"
+        | "MEDIUM_51_200"
+        | "LARGE_201_500"
+        | "ENTERPRISE_500_PLUS";
+      plan: "FREE" | "STARTER" | "PROFESSIONAL" | "ENTERPRISE";
+      settings: Record<string, unknown>;
+    };
+  };
+  message: string;
+  meta: {
+    timestamp: string;
+  };
+};
+
+// Server action result type (discriminated union for client consumption)
+export type GetCurrentCompanyActionResult =
+  | {
+      success: true;
+      data: GetCurrentCompanyBackendResponse["data"];
+    }
+  | {
+      success: false;
+      error: string;
+    };

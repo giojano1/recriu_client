@@ -25,10 +25,7 @@ export function DashboardSidebar({
           className="hover:bg-transparent active:bg-transparent"
         >
           <div>
-            <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-              <Logo size="sm" />
-            </div>
-
+            <Logo size="sm" />
             <span className="text-lg font-bold">Recriu</span>
           </div>
         </SidebarMenuButton>
