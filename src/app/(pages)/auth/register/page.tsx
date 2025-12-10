@@ -1,3 +1,6 @@
+import { authRoutes } from "@/constants/routes";
+import RegisterForm from "@/features/auth/register/register.form";
+import AuthPageWrapper from "@/features/auth/shared/components/page-wrapper";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -21,5 +24,18 @@ export const metadata: Metadata = {
   },
 };
 export default function RegisterPage() {
-  return <div>RegisterPage</div>;
+  return (
+    <AuthPageWrapper>
+      <AuthPageWrapper.Header
+        title="Create your account"
+        subtitle="Fill in the form below to create your account."
+      />
+      <RegisterForm />
+      <AuthPageWrapper.Footer
+        text="Already have an account?"
+        linkText="Sign In"
+        linkHref={authRoutes.LOGIN}
+      />
+    </AuthPageWrapper>
+  );
 }

@@ -1,5 +1,5 @@
 import { authRoutes } from "@/constants/routes";
-import AuthPageWrapper from "@/features/auth/components/page-wrapper";
+import AuthPageWrapper from "@/features/auth/shared/components/page-wrapper";
 import LoginForm from "@/features/auth/login/login.form";
 
 import { Metadata } from "next";

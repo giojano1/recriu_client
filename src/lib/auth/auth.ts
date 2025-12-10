@@ -3,11 +3,11 @@ import Credentials from "next-auth/providers/credentials";
 import { env } from "@/config/env";
 import ServerAPI from "@/lib/api/server-api";
 import { logger } from "@/lib/utils/logger";
-import { AUTH_COOKIE_CONFIG } from "@/features/auth/utils/auth.config";
+import { AUTH_COOKIE_CONFIG } from "@/features/auth/shared/utils/auth.config";
 import type {
   LoginResponse,
   TwoFactorRequiredResponse,
-} from "@/features/auth/types";
+} from "@/features/auth/shared/types";
 import axios from "axios";
 import type { JWT } from "next-auth/jwt";
 

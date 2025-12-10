@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { auth } from "@/lib/auth/auth";
 import { authRoutes, companyRoutes, dashboardRoutes } from "./constants/routes";
-import { AUTH_COOKIE_CONFIG } from "./features/auth/utils/auth.config";
+import { AUTH_COOKIE_CONFIG } from "./features/auth/shared/utils/auth.config";
 
 const ROUTE_CONFIG = {
   // Routes that require authentication

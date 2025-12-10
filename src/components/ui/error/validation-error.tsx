@@ -14,7 +14,7 @@ export default function ValidationError({
       transition={{ duration: 0.2 }}
     >
       <CircleAlert width={12} height={12} />
-      <span className="truncate text-[12px] ">{errorMessage}</span>
+      <span className="truncate text-[12px] flex-1 ">{errorMessage}</span>
     </motion.span>
   );
 }
