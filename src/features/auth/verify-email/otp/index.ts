@@ -1,1 +1,1 @@
-export * from "./verify-email-otp-form";
+export * from "./verify-email-otp.form";

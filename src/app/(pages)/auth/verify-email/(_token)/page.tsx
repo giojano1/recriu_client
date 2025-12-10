@@ -1,5 +1,5 @@
 import AuthPageWrapper from "@/features/auth/shared/components/page-wrapper";
-import VerfiyEmailForm from "@/features/auth/verify-email/token/verify-email-form";
+import VerfiyEmailForm from "@/features/auth/verify-email/token/verify-email.form";
 import { authRoutes } from "@/constants/routes";
 import { Metadata } from "next";
 import { redirect } from "next/navigation";

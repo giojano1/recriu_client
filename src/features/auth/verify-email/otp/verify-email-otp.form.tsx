@@ -72,7 +72,7 @@ export function VerifyEmailByOtpForm({ email }: { email: string }) {
             />
           )}
         />
-        {formMethods.formState.errors.otp && (
+        {formMethods.formState.errors.otp?.message && (
           <OtpInput.Error message={formMethods.formState.errors.otp.message} />
         )}
       </div>

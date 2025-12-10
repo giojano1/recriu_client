@@ -1,5 +1,5 @@
 import AuthPageWrapper from "@/features/auth/shared/components/page-wrapper";
-import ResetPasswordForm from "@/features/auth/password/reset/reset-password-form";
+import ResetPasswordForm from "@/features/auth/password/reset/reset-password.form";
 import { authRoutes } from "@/constants/routes";
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
