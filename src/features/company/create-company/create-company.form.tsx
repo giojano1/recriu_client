@@ -7,14 +7,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import FormInput from "@/components/ui/inputs/form-input";
+import Selector from "@/components/ui/inputs/selector";
+import FormWrapper from "@/components/ui/wrapper/form-wrapper";
 import { useTypedForm } from "@/hooks/use-typed-form";
+import { CompanySize } from "../shared/types";
 import {
   createCompanyDefaultValues,
   createCompanySchema,
 } from "./create-company.schema";
-import FormWrapper from "@/components/ui/wrapper/form-wrapper";
-import Selector from "@/components/ui/inputs/selector";
-import { CompanySize } from "../shared/types";
 import { useCreateCompany } from "./use-create-company";
 const companySizeList = [
   {
@@ -42,7 +42,7 @@ export default function CreateCompanyForm() {
   const formMethods = useTypedForm(createCompanySchema, {
     defaultValues: createCompanyDefaultValues,
   });
-  const { register, control } = formMethods;
+  const { register } = formMethods;
   const { mutate, isPending } = useCreateCompany();
   return (
     <Card>
