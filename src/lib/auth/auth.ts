@@ -247,6 +247,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             error: undefined,
           };
         }
+
+        // Handle companyId update (e.g., after company creation)
+        if (session.companyId !== undefined) {
+          logger.info("JWT callback: Updating companyId in session", {
+            action: "jwt_update_companyId",
+            metadata: { companyId: session.companyId },
+          });
+          return {
+            ...token,
+            companyId: session.companyId,
+          };
+        }
       }
 
       if (account && user) {
