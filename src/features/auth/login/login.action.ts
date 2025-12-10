@@ -2,7 +2,7 @@
 
 import { logger } from "@/lib/utils/logger";
 import { LoginFormType, loginSchema } from "./login.schema";
-import { LoginActionResult } from "../types";
+import { LoginActionResult } from "../shared/types";
 import { hashEmail } from "@/lib/utils/hash-pii";
 import { signIn, auth } from "@/lib/auth/auth";
 import { dashboardRoutes, companyRoutes } from "@/constants/routes";
@@ -11,7 +11,7 @@ import { AuthError } from "next-auth";
 import {
   handleAuthCsrf,
   handleAuthValidationError,
-} from "../utils/error-handlers";
+} from "../shared/utils/error-handlers";
 
 export async function loginAction(
   data: LoginFormType

@@ -1,19 +1,20 @@
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import { registerAction } from "./register.action";
+import { RegisterActionResult } from "../shared/types";
 import { toast } from "sonner";
 import { getErrorMessage } from "@/lib/api/api-error";
-import { loginAction } from "./login.action";
-import { LoginActionResult } from "../shared/types";
 
-export const useLogin = () => {
+export const useRegister = () => {
   const router = useRouter();
-
   return useMutation({
-    mutationFn: loginAction,
+    mutationFn: registerAction,
     retry: false,
-    onSuccess: (data: LoginActionResult) => {
+    onSuccess: (data: RegisterActionResult) => {
       if (data.success) {
-        toast.success("Login successful!");
+        toast.success(
+          "Registration successful! Check your email to verify your account."
+        );
         if (data.redirectUrl) {
           router.push(data.redirectUrl);
         }
