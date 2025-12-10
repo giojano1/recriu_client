@@ -4,8 +4,6 @@ import {
   InputOTPSeparator,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { motion } from "framer-motion";
-import { CircleAlert } from "lucide-react";
 import ValidationError from "../error/validation-error";
 
 export default function OtpInput({
