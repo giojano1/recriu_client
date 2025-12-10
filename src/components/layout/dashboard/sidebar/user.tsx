@@ -14,6 +14,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useGetCurrentUser } from "@/features/user/get-current-user";
 import {
   BadgeCheck,
@@ -28,7 +29,7 @@ export default function User() {
   const { data, isLoading, error } = useGetCurrentUser();
   const { isMobile } = useSidebar();
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <div></div>;
   if (error) return <div>Error loading user data</div>;
   if (!data) return null;
   const user = data.user;
