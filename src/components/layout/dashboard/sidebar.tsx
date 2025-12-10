@@ -1,8 +1,5 @@
 "use client";
-
-import { AudioWaveform, Command, GalleryVerticalEnd } from "lucide-react";
 import * as React from "react";
-
 import { NavUser } from "@/components/common/nav-user";
 import { Navbar } from "@/components/common/navbar";
 import Logo from "@/components/ui/logos/logo";
@@ -16,30 +13,12 @@ import {
 } from "@/components/ui/sidebar";
 import { navLinks } from "@/constants/nav-links";
 
-// This is sample data.
 const data = {
   user: {
     name: "shadcn",
     email: "m@example.com",
     avatar: "/avatars/shadcn.jpg",
   },
-  teams: [
-    {
-      name: "Acme Inc",
-      logo: GalleryVerticalEnd,
-      plan: "Enterprise",
-    },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
-    },
-  ],
 };
 
 export function DashboardSidebar({
@@ -63,7 +42,7 @@ export function DashboardSidebar({
         </SidebarMenuButton>
       </SidebarHeader>
       <SidebarContent>
-        <Navbar navLinks={navLinks} />
+        <Navbar navLinks={navLinks} label="Main Navigation" />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />
