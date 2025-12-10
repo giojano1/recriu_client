@@ -23,6 +23,7 @@ export default function FormInput<T extends FieldValues>({
   readOnly,
   disabled,
   className,
+  required,
 }: InputProps<T>) {
   const errorMessage = errors ? (errors[name] as FieldError)?.message : "";
   const errorId = errorMessage ? `${name}-error` : undefined;
@@ -49,6 +50,7 @@ export default function FormInput<T extends FieldValues>({
           className="text-default mb-1.5 block text-sm font-medium"
         >
           {label}
+          {required && <span className="ml-px text-red-500">*</span>}
         </label>
       )}
       {/* input */}
@@ -75,14 +77,14 @@ export default function FormInput<T extends FieldValues>({
         />
         {/* Left component */}
         {LeftComponent && (
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center">
+          <div className="absolute top-1/2 left-3 flex -translate-y-1/2 items-center">
             {LeftComponent}
           </div>
         )}
 
         {/* Right component */}
         {RightComponent && (
-          <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center">
+          <div className="absolute top-1/2 right-3 flex -translate-y-1/2 items-center">
             {RightComponent}
           </div>
         )}

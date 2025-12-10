@@ -17,6 +17,7 @@ export default function Selector<T extends FieldValues>({
   placeholder,
   list,
   disabled = false,
+  required,
 }: SelectorProps<T>) {
   const errorMessage = errors ? (errors[name] as FieldError)?.message : "";
 
@@ -28,6 +29,7 @@ export default function Selector<T extends FieldValues>({
           className="text-default mb-1.5 block text-sm font-medium"
         >
           {label}
+          {required && <span className="ml-px text-red-500">*</span>}
         </label>
       )}
       <Controller

@@ -1,5 +1,4 @@
 "use client";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -16,6 +15,7 @@ import {
 import FormWrapper from "@/components/ui/wrapper/form-wrapper";
 import Selector from "@/components/ui/inputs/selector";
 import { CompanySize } from "../shared/types";
+import { useCreateCompany } from "./use-create-company";
 const companySizeList = [
   {
     value: CompanySize.STARTUP_1_10,
@@ -43,10 +43,7 @@ export default function CreateCompanyForm() {
     defaultValues: createCompanyDefaultValues,
   });
   const { register, control } = formMethods;
-  const isPending = false; // Replace with actual pending state
-  const registerUser = (data) => {
-    console.log(data);
-  };
+  const { mutate, isPending } = useCreateCompany();
   return (
     <Card>
       <CardHeader className="text-center">
@@ -58,7 +55,7 @@ export default function CreateCompanyForm() {
       <CardContent>
         <FormWrapper
           formMethods={formMethods}
-          onSubmit={registerUser}
+          onSubmit={mutate}
           isPending={isPending}
           ariaLabel="Create Company Form"
           submitButtonLabel="Create"
@@ -71,6 +68,7 @@ export default function CreateCompanyForm() {
             register={register}
             errors={formMethods.formState.errors}
             disabled={isPending}
+            required={true}
           />
           <FormInput
             label="Slug"
@@ -80,6 +78,7 @@ export default function CreateCompanyForm() {
             register={register}
             errors={formMethods.formState.errors}
             disabled={isPending}
+            required={true}
             LeftComponent={
               <p className="text-muted-foreground text-sm">recriu.com/</p>
             }
@@ -100,6 +99,7 @@ export default function CreateCompanyForm() {
             errors={formMethods.formState.errors}
             disabled={isPending}
             list={companySizeList}
+            required={true}
           />
         </FormWrapper>
       </CardContent>

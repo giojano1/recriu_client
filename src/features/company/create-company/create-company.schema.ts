@@ -22,7 +22,13 @@ export const createCompanySchema = z.object({
       message: "This slug is reserved and cannot be used",
     }),
 
-  size: z.enum(CompanySize),
+  size: z.enum([
+    "STARTUP_1_10",
+    "SMALL_11_50",
+    "MEDIUM_51_200",
+    "LARGE_201_1000",
+    "ENTERPRISE_1000_PLUS",
+  ]),
 
   website: z
     .url("Please enter a valid URL starting with http or https")

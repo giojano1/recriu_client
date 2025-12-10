@@ -21,6 +21,7 @@ export type InputProps<T extends FieldValues> = {
   type?: string;
   readOnly?: boolean;
   disabled?: boolean;
+  required?: boolean;
   className?: string;
   onClick?: () => void;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -46,4 +47,5 @@ export type SelectorProps<T extends FieldValues> = {
   errors: FieldErrors<T>;
   disabled?: boolean;
   label?: string;
+  required?: boolean;
 };
