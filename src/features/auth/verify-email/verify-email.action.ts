@@ -24,6 +24,7 @@ import {
   handleAuthValidationError,
   handleAuthApiError,
 } from "../shared/utils/error-handlers";
+import verifyEmailTokenSchema from "./token/verify-email-token.schema";
 
 export async function verifyEmailOtpAction(
   data: VerifyEmailOtpFormType
@@ -140,68 +141,68 @@ export async function resendOtpAction(
   }
 }
 
-// export async function verifyEmailTokenAction(
-//   token: string
-// ): Promise<VerifyEmailTokenActionResult> {
-//   try {
-//     //* CSRF Protection: Verify origin matches host
-//     const csrfError = await handleAuthCsrf("verify_email_token");
-//     if (csrfError) return csrfError;
+export async function verifyEmailTokenAction(
+  token: string
+): Promise<VerifyEmailTokenActionResult> {
+  try {
+    //* CSRF Protection: Verify origin matches host
+    const csrfError = await handleAuthCsrf("verify_email_token");
+    if (csrfError) return csrfError;
 
-//     //* Validate and sanitize input data
-//     const validatedData = verifyEmailTokenSchema.parse({ token });
+    //* Validate and sanitize input data
+    const validatedData = verifyEmailTokenSchema.parse({ token });
 
-//     logger.info("Email token verification attempt", {
-//       action: "verify_email_token_attempt",
-//       metadata: { tokenLength: validatedData.token.length },
-//     });
+    logger.info("Email token verification attempt", {
+      action: "verify_email_token_attempt",
+      metadata: { tokenLength: validatedData.token.length },
+    });
 
-//     const res = await ServerAPI.post<VerifyEmailTokenResponse>(
-//       `/auth/verify-email/token?token=${validatedData.token}`
-//     );
+    const res = await ServerAPI.post<VerifyEmailTokenResponse>(
+      `/auth/verify-email/token?token=${validatedData.token}`
+    );
 
-//     const { success } = res.data;
+    const { success } = res.data;
 
-//     logger.info("Email token verification successful", {
-//       action: "verify_email_token_success",
-//       metadata: { success },
-//     });
+    logger.info("Email token verification successful", {
+      action: "verify_email_token_success",
+      metadata: { success },
+    });
 
-//     await setVerifiedCookie();
-//     await cleanupVerificationCookies();
+    await setVerifiedCookie();
+    await cleanupVerificationCookies();
 
-//     // Revalidate cache after successful verification
-//     revalidatePath(authRoutes.LOGIN);
+    // Revalidate cache after successful verification
+    revalidatePath(authRoutes.LOGIN);
 
-//     return {
-//       success: true,
-//       verified: true,
-//       redirectUrl: authRoutes.LOGIN,
-//     };
-//   } catch (error) {
-//     if (error instanceof ZodError) {
-//       return handleAuthValidationError(error, "verify_email_token");
-//     }
+    return {
+      success: true,
+      verified: true,
+      redirectUrl: authRoutes.LOGIN,
+    };
+  } catch (error) {
+    if (error instanceof ZodError) {
+      return handleAuthValidationError(error, "verify_email_token");
+    }
 
-//     return handleAuthApiError(error, {
-//       actionName: "verify_email_token",
-//       statusHandlers: {
-//         400: {
-//           action: "invalid_format",
-//           message: "Invalid token format",
-//         },
-//         401: {
-//           action: "invalid",
-//           message: "Invalid or expired token",
-//         },
-//         404: {
-//           action: "not_found",
-//           message: "Token not found",
-//         },
-//       },
-//     });
-//   }
-// }
+    return handleAuthApiError(error, {
+      actionName: "verify_email_token",
+      statusHandlers: {
+        400: {
+          action: "invalid_format",
+          message: "Invalid token format",
+        },
+        401: {
+          action: "invalid",
+          message: "Invalid or expired token",
+        },
+        404: {
+          action: "not_found",
+          message: "Token not found",
+        },
+      },
+    });
+  }
+}
 
 //* helpers
 async function setVerifiedCookie(): Promise<void> {

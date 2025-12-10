@@ -6,6 +6,7 @@ import {
 } from "@/components/ui/input-otp";
 import { motion } from "framer-motion";
 import { CircleAlert } from "lucide-react";
+import ValidationError from "../error/validation-error";
 
 export default function OtpInput({
   value,
@@ -40,16 +41,6 @@ export default function OtpInput({
     </InputOTP>
   );
 }
-OtpInput.Error = function Error({ message }: { message?: string }) {
-  return (
-    <motion.span
-      className="text-error-base absolute top-full mt-[2.5px] flex max-h-6 w-full items-center gap-1 overflow-hidden text-[11px]"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.2 }}
-    >
-      <CircleAlert width={11} height={11} />
-      {message}
-    </motion.span>
-  );
+OtpInput.Error = function Error({ message }: { message: string }) {
+  return <ValidationError errorMessage={message} />;
 };
