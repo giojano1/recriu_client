@@ -1,0 +1,17 @@
+# Dependencies
+node_modules
+.pnpm-store
+
+# Build outputs
+.next
+out
+dist
+build
+
+# Misc
+.git
+.cache
+*.log
+package-lock.json
+pnpm-lock.yaml
+yarn.lock

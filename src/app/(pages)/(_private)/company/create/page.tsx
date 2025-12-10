@@ -26,8 +26,8 @@ export const metadata: Metadata = {
 
 export default async function page() {
   return (
-    <div className="h-svh max-w-[1440px] mx-auto flex items-center justify-center p-8">
-      <div className="flex justify-between w-full gap-8 h-full">
+    <div className="mx-auto flex h-svh max-w-[1440px] items-center justify-center gap-4 px-4 py-6 md:p-10">
+      <div className="max-1200:gap-4 flex h-full w-full justify-between gap-6">
         <CreateCompanyPageTitle />
         <CreateCompanyForm />
       </div>

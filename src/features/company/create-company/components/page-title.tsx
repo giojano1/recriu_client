@@ -1,6 +1,6 @@
 export default function CreateCompanyPageTitle() {
   return (
-    <div className="flex-1 border h-full flex flex-col justify-center gap-[30px]  ">
+    <div className="max-1200:px-3 max-1000:hidden flex h-full flex-1 flex-col items-center justify-center gap-[30px] px-6">
       <h1 className="text-4xl font-bold">
         We need some of your Company Information
       </h1>
