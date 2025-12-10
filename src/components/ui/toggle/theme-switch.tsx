@@ -2,13 +2,16 @@
 
 import { useMounted } from "@/hooks/use-mounted";
 import { useTheme } from "next-themes";
+import { Button } from "../button";
 
 export default function ThemeSwitch() {
   const { resolvedTheme, setTheme } = useTheme();
   const mounted = useMounted();
 
   return (
-    <button
+    <Button
+      size="icon"
+      variant="ghost"
       onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
     >
       <svg
@@ -30,6 +33,6 @@ export default function ThemeSwitch() {
         <path d="M12 14.3l7.37 -7.37"></path>
         <path d="M12 19.6l8.85 -8.85"></path>
       </svg>
-    </button>
+    </Button>
   );
 }
