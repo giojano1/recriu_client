@@ -1,12 +1,10 @@
 "use client";
 
-import { useMounted } from "@/hooks/use-mounted";
 import { useTheme } from "next-themes";
 import { Button } from "../button";
 
 export default function ThemeSwitch() {
   const { resolvedTheme, setTheme } = useTheme();
-  const mounted = useMounted();
 
   return (
     <Button

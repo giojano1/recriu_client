@@ -14,7 +14,6 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useGetCurrentUser } from "@/features/user/get-current-user";
 import {
   BadgeCheck,
@@ -22,7 +21,6 @@ import {
   ChevronsUpDown,
   CreditCard,
   LogOut,
-  Sparkles,
 } from "lucide-react";
 
 export default function User() {
