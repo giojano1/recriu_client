@@ -15,27 +15,38 @@ export default function PublicPageBtn({ className }: { className?: string }) {
 
     setDisabled(true);
 
-    const url = "https://recriu.com/app_name";
+    const url = `https://recriu.com/${data?.company.slug}`;
     await navigator.clipboard.writeText(url);
 
     setTimeout(() => setDisabled(false), 2000);
     toast.success("Public page URL copied to clipboard!");
   };
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading)
+    return (
+      <Button
+        size="sm"
+        variant="outline"
+        className={`flex items-center gap-2 ${className}`}
+      >
+        <span className="max-w-[130px] truncate text-[12px] font-bold">
+          Loading...
+        </span>
+      </Button>
+    );
   if (error) return <div>Error loading company</div>;
   if (!data) return null;
   return (
     <Button
       size="sm"
       variant="outline"
-      disabled={disabled}
+      disabled={disabled || !data.company.slug || isLoading}
       onClick={handleCopy}
       className={`flex items-center gap-2 ${className}`}
     >
       <div className="mt-0.5 -mr-0.5 size-2 rounded-full bg-green-500" />
       <span className="max-w-[130px] truncate text-[12px] font-bold">
-        recriu.com/{data.company.slug}
+        {isLoading ? "Loading..." : `recriu.com/${data.company.slug}`}
       </span>
       <Copy className="size-3.5" />
     </Button>
