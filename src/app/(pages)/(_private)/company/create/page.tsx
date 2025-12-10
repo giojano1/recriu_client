@@ -1,4 +1,5 @@
 import CreateCompanyForm from "@/features/company/create-company/components/create-company.form";
+import CreateCompanyHeader from "@/features/company/create-company/components/header";
 import CreateCompanyPageTitle from "@/features/company/create-company/components/page-title";
 import { Metadata } from "next";
 
@@ -26,8 +27,9 @@ export const metadata: Metadata = {
 
 export default async function page() {
   return (
-    <div className="mx-auto flex h-svh max-w-[1440px] items-center justify-center gap-4 px-4 py-6 md:p-10">
-      <div className="max-1200:gap-4 flex h-full w-full justify-between gap-6">
+    <div className="flex h-svh flex-col">
+      <CreateCompanyHeader />
+      <div className="mx-auto flex max-h-[700px] min-h-0 w-full max-w-[1440px] flex-1 justify-between gap-12 px-4 py-6 md:p-10">
         <CreateCompanyPageTitle />
         <CreateCompanyForm />
       </div>

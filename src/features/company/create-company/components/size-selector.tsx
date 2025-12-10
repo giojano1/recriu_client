@@ -15,7 +15,7 @@ export default function SizeSelector() {
     { label: "1000+", value: CompanySize.ENTERPRISE_1000_PLUS },
   ];
   return (
-    <ul className="flex gap-4 flex-wrap">
+    <ul className="flex flex-wrap gap-4">
       {options.map((option) => {
         const isSelected = selectedSize === option.value;
         return (
@@ -45,21 +45,22 @@ function SelectorButton({
       size="lg"
       variant="outline"
       className={cn(
-        `w-[140px] justify-between px-4 group `,
-        isSelected && "border-primary "
+        `group w-[130px] justify-between px-4`,
+        isSelected &&
+          "border-primary dark:border-card-foreground bg-accent dark:bg-input/50"
       )}
       onClick={onClick}
     >
       {children}
       <div
         className={cn(
-          `size-5 rounded-full border flex items-center justify-center`,
-          isSelected ? "border-primary bg-primary" : "border-muted "
+          `flex size-5 items-center justify-center rounded-full border`,
+          isSelected ? "border-primary bg-primary" : "border"
         )}
       >
         <div
           className={cn(
-            isSelected && "bg-white dark:bg-accent size-2.5 rounded-full"
+            isSelected && "dark:bg-accent size-2.5 rounded-full bg-white"
           )}
         />
       </div>
