@@ -1,6 +1,4 @@
 "use client";
-import * as React from "react";
-import { NavUser } from "@/components/common/nav-user";
 import { Navbar } from "@/components/common/navbar";
 import Logo from "@/components/ui/logos/logo";
 import {
@@ -12,14 +10,8 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { navLinks } from "@/constants/nav-links";
-
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-};
+import * as React from "react";
+import User from "./user";
 
 export function DashboardSidebar({
   ...props
@@ -45,7 +37,7 @@ export function DashboardSidebar({
         <Navbar navLinks={navLinks} label="Main Navigation" />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <User />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

@@ -126,19 +126,41 @@ export type TwoFaLoginActionResult =
       success: false;
       error: string;
     };
-export type GetCurrentUserResponse =
+// Backend API response type (full response from /users/me)
+export type GetCurrentUserBackendResponse = {
+  success: true;
+  data: {
+    user: {
+      id: string;
+      email: string;
+      firstName: string;
+      lastName: string;
+      isEmailVerified: boolean;
+      twoFactorEnabled: boolean;
+      status: "ACTIVE" | "INACTIVE" | "SUSPENDED";
+    };
+    company: {
+      id: string;
+      name: string;
+      size:
+        | "SMALL_11_50"
+        | "MEDIUM_51_200"
+        | "LARGE_201_500"
+        | "ENTERPRISE_500_PLUS";
+    } | null;
+    role: "PRIMARY_ADMIN" | "ADMIN" | "MEMBER" | "GUEST";
+  };
+  message: string;
+  meta: {
+    timestamp: string;
+  };
+};
+
+// Server action result type (discriminated union for client consumption)
+export type GetCurrentUserActionResult =
   | {
       success: true;
-      user: {
-        email: string;
-        firstName: string;
-        lastName: string;
-        id: string;
-        isEmailVerified: boolean;
-        status: string;
-        twoFactorEnabled: boolean;
-      };
-      memberships: string[];
+      data: GetCurrentUserBackendResponse["data"];
     }
   | {
       success: false;
