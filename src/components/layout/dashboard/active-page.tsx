@@ -1,8 +1,7 @@
 "use client";
 
-import { usePathname } from "next/navigation";
 import { navLinks } from "@/constants/nav-links";
-import { BreadcrumbItem, BreadcrumbPage } from "@/components/ui/breadcrumb";
+import { usePathname } from "next/navigation";
 
 export default function ActiveDashboardPage() {
   const pathname = usePathname();
@@ -11,15 +10,7 @@ export default function ActiveDashboardPage() {
 
   return (
     <div>
-      {activePage && (
-        <h1>
-          <BreadcrumbItem>
-            <BreadcrumbPage className="font-medium">
-              {activePage.name}
-            </BreadcrumbPage>
-          </BreadcrumbItem>
-        </h1>
-      )}
+      {activePage && <h1 className="font-medium">{activePage.name}</h1>}
     </div>
   );
 }
