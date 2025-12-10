@@ -9,6 +9,10 @@ export const authRoutes = {
 
 export const dashboardRoutes = {
   DASHBOARD: "/dashboard",
+  CANDIDATES: "/dashboard/candidates",
+  JOBS: "/dashboard/jobs",
+  SETTINGS: "/dashboard/settings",
+  ANALYTICS: "/dashboard/analytics",
 };
 
 export const companyRoutes = {
