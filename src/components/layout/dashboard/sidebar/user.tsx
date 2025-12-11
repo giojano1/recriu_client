@@ -1,3 +1,5 @@
+"use client";
+
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -15,17 +17,24 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useGetCurrentUser } from "@/features/user/get-current-user";
+import { useLogout } from "@/features/auth/logout/use-logout";
 import {
   BadgeCheck,
   Bell,
   ChevronsUpDown,
   CreditCard,
   LogOut,
+  Loader2,
 } from "lucide-react";
 
 export default function User() {
   const { data, isLoading, error } = useGetCurrentUser();
   const { isMobile } = useSidebar();
+  const { mutate: logout, isPending: isLoggingOut } = useLogout();
+
+  const handleLogout = () => {
+    logout();
+  };
 
   if (isLoading) return <div></div>;
   if (error) return <div>Error loading user data</div>;
@@ -90,9 +99,17 @@ export default function User() {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <LogOut />
-              Log out
+            <DropdownMenuItem
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+              className="cursor-pointer"
+            >
+              {isLoggingOut ? (
+                <Loader2 className="animate-spin" />
+              ) : (
+                <LogOut />
+              )}
+              {isLoggingOut ? "Logging out..." : "Log out"}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
