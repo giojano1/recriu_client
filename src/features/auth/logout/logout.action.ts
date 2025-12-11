@@ -7,30 +7,9 @@ import { authRoutes } from "@/constants/routes";
 import type { LogoutActionResult } from "../shared/types";
 import { cookies } from "next/headers";
 
-/**
- * Logout Server Action
- *
- * Implements secure logout functionality with:
- * - CSRF protection
- * - Manual NextAuth session cookie cleanup
- * - Proper logging
- * - Error handling
- *
- * This action manually clears NextAuth cookies:
- * 1. Clears the session token cookie (next-auth.session-token)
- * 2. Clears the CSRF token cookie
- * 3. Clears the callback URL cookie
- * 4. Returns redirect URL for client-side navigation
- *
- * Note: We manually delete cookies instead of using signOut() to avoid
- * redirect errors in Next.js 16 server actions.
- *
- * Additional cleanup (TanStack Query cache, client state) should be
- * handled on the client side before calling this action.
- */
 export async function logoutAction(): Promise<LogoutActionResult> {
   // CSRF Protection: Verify origin matches host
-  const csrfError = await handleAuthCsrf<LogoutActionResult>("logout");
+  const csrfError = await handleAuthCsrf("logout");
   if (csrfError) return csrfError;
 
   logger.info("Logout attempt initiated", {
@@ -48,7 +27,6 @@ export async function logoutAction(): Promise<LogoutActionResult> {
     }
 
     // Manually clear NextAuth session cookies
-    // This is more reliable than signOut() in server actions which can cause redirect errors
     const cookieStore = await cookies();
 
     // Clear all NextAuth related cookies
@@ -74,7 +52,8 @@ export async function logoutAction(): Promise<LogoutActionResult> {
       action: "logout_failed",
       error: error instanceof Error ? error.message : "Unknown error",
       metadata: {
-        errorType: error instanceof Error ? error.constructor.name : typeof error,
+        errorType:
+          error instanceof Error ? error.constructor.name : typeof error,
       },
     });
 
