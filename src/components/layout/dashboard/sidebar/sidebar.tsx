@@ -13,6 +13,7 @@ import { navLinks } from "@/constants/nav-links";
 import { SquareTerminal } from "lucide-react";
 import * as React from "react";
 import { PlanCard } from "./plan-card";
+import User from "./user";
 const navLinksTwo = [
   {
     title: "Label One",
@@ -59,6 +60,7 @@ export function DashboardSidebar({
       </SidebarContent>
       <SidebarFooter>
         <PlanCard />
+        <User />
       </SidebarFooter>
     </Sidebar>
   );
