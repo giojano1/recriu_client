@@ -6,7 +6,6 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -16,15 +15,15 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { useGetCurrentUser } from "@/features/user/get-current-user";
 import { useLogout } from "@/features/auth/logout/use-logout";
+import { useGetCurrentUser } from "@/features/user/get-current-user";
 import {
   BadgeCheck,
   Bell,
   ChevronsUpDown,
   CreditCard,
-  LogOut,
   Loader2,
+  LogOut,
 } from "lucide-react";
 
 export default function User() {

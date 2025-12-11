@@ -13,7 +13,7 @@ export function PlanCard() {
   return (
     <Card className="gap-2 py-4 shadow-none">
       <CardHeader className="gap-1 px-4">
-        <CardTitle className="text-sm">You're on Growth</CardTitle>
+        <CardTitle className="text-sm">You&apos;re on Growth</CardTitle>
         <CardDescription className="text-[12px]">
           Upgrade to unlock new features and expand your usage limits.
         </CardDescription>
