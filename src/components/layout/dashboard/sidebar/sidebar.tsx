@@ -1,17 +1,13 @@
 "use client";
-import { Navbar } from "@/components/common/navbar";
 import Logo from "@/components/ui/logos/logo";
 import {
   Sidebar,
-  SidebarContent,
-  SidebarFooter,
   SidebarHeader,
   SidebarMenuButton,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { navLinks } from "@/constants/nav-links";
 import * as React from "react";
-import User from "./user";
+import MainSidebarContent from "./sidebar-content";
 
 export function DashboardSidebar({
   ...props
@@ -30,12 +26,8 @@ export function DashboardSidebar({
           </div>
         </SidebarMenuButton>
       </SidebarHeader>
-      <SidebarContent>
-        <Navbar navLinks={navLinks} label="Main" />
-      </SidebarContent>
-      <SidebarFooter>
-        <User />
-      </SidebarFooter>
+      {props.children}
+      <MainSidebarContent />
       <SidebarRail />
     </Sidebar>
   );

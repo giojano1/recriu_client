@@ -23,7 +23,7 @@ import {
   LogOut,
 } from "lucide-react";
 
-export default function User() {
+export default function UserBar() {
   const { data, isLoading, error } = useGetCurrentUser();
   const { isMobile } = useSidebar();
 

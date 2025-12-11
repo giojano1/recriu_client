@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 export default function ActiveDashboardPage() {
   const pathname = usePathname();
 
-  const activePage = navLinks.find((link) => pathname === link.url);
+  const activePage = navLinks.dashboard.find((link) => pathname === link.url);
 
   return (
     <div>
