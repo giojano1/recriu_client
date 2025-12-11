@@ -24,11 +24,12 @@ export default async function PrivateRoutesLayout({
     redirect(authRoutes.LOGIN);
   }
 
-  // Prefetch current user data
+  // Prefetch current user and company data in parallel with coordination
   const queryClient = getQueryClient();
 
-  try {
-    await queryClient.prefetchQuery({
+  // Run both prefetches in parallel and capture all results
+  const results = await Promise.allSettled([
+    queryClient.prefetchQuery({
       queryKey: queryKeys.user.current(),
       queryFn: async () => {
         const result = await getCurrentUserAction();
@@ -38,25 +39,17 @@ export default async function PrivateRoutesLayout({
             action: "prefetch_current_user_failed",
             metadata: { error: result.error },
           });
-          return null;
+
+          // Throw to mark this prefetch as failed
+          throw new Error(result.error);
         }
 
         return result.data;
       },
       staleTime: 60 * 1000,
-    });
-  } catch (error) {
-    logger.error("Error during user data prefetch", {
-      action: "prefetch_current_user_error",
-      metadata: {
-        error: error instanceof Error ? error.message : "Unknown error",
-      },
-    });
-  }
+    }),
 
-  // Prefetch current company data
-  try {
-    await queryClient.prefetchQuery({
+    queryClient.prefetchQuery({
       queryKey: queryKeys.company.current(),
       queryFn: async () => {
         const result = await getCurrentCompanyAction();
@@ -66,21 +59,55 @@ export default async function PrivateRoutesLayout({
             action: "prefetch_current_company_failed",
             metadata: { error: result.error },
           });
-          return null;
+
+          // Throw to mark this prefetch as failed
+          throw new Error(result.error);
         }
 
         return result.data;
       },
       staleTime: 60 * 1000,
+    }),
+  ]);
+
+  // Check if any prefetch failed due to authentication
+  // Auth errors typically contain "unauthorized", "token", or "session" keywords
+  const hasAuthError = results.some((result) => {
+    if (result.status === "rejected") {
+      const errorMessage = result.reason?.message?.toLowerCase() || "";
+      return (
+        errorMessage.includes("unauthorized") ||
+        errorMessage.includes("token") ||
+        errorMessage.includes("session") ||
+        errorMessage.includes("authentication")
+      );
+    }
+    return false;
+  });
+
+  // If auth error detected, force redirect to login
+  if (hasAuthError) {
+    logger.error("Authentication error during prefetch, redirecting to login", {
+      action: "prefetch_auth_error_redirect",
     });
-  } catch (error) {
-    logger.error("Error during company data prefetch", {
-      action: "prefetch_current_company_error",
-      metadata: {
-        error: error instanceof Error ? error.message : "Unknown error",
-      },
-    });
+    redirect(authRoutes.LOGIN);
   }
+
+  // Log any non-auth errors (data will be fetched client-side)
+  results.forEach((result, index) => {
+    if (result.status === "rejected") {
+      const queryName = index === 0 ? "user" : "company";
+      logger.error(`Error during ${queryName} data prefetch`, {
+        action: `prefetch_current_${queryName}_error`,
+        metadata: {
+          error:
+            result.reason instanceof Error
+              ? result.reason.message
+              : "Unknown error",
+        },
+      });
+    }
+  });
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

@@ -7,7 +7,6 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarMenuButton,
-  SidebarRail,
 } from "@/components/ui/sidebar";
 import { navLinks } from "@/constants/nav-links";
 import * as React from "react";
@@ -36,7 +35,6 @@ export function DashboardSidebar({
       <SidebarFooter>
         <User />
       </SidebarFooter>
-      <SidebarRail />
     </Sidebar>
   );
 }
