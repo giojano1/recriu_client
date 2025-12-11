@@ -104,11 +104,7 @@ export default function User() {
               disabled={isLoggingOut}
               className="cursor-pointer"
             >
-              {isLoggingOut ? (
-                <Loader2 className="animate-spin" />
-              ) : (
-                <LogOut />
-              )}
+              {isLoggingOut ? <Loader2 className="animate-spin" /> : <LogOut />}
               {isLoggingOut ? "Logging out..." : "Log out"}
             </DropdownMenuItem>
           </DropdownMenuContent>
