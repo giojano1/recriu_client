@@ -14,14 +14,14 @@ export const navLinks = [
     icon: LayoutDashboard,
   },
   {
-    name: "Candidates",
-    url: dashboardRoutes.CANDIDATES,
-    icon: SquareUser,
-  },
-  {
     name: "Jobs",
     url: dashboardRoutes.JOBS,
     icon: Briefcase,
+  },
+  {
+    name: "Candidates",
+    url: dashboardRoutes.CANDIDATES,
+    icon: SquareUser,
   },
   {
     name: "Analytics",
