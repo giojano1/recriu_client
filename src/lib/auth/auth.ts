@@ -10,7 +10,87 @@ import type {
 } from "@/features/auth/shared/types";
 import axios from "axios";
 import type { JWT } from "next-auth/jwt";
+import { getCachedRefresh, setCachedRefresh } from "./refresh-cache";
 
+async function performTokenRefresh(token: JWT): Promise<JWT> {
+  logger.info("Attempting to refresh access token", {
+    action: "token_refresh_attempt",
+  });
+
+  const response = await axios.post(
+    `${env.API_URL}/auth/refresh`,
+    {},
+    {
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": env.API_KEY,
+        Cookie: `refreshToken=${token.refreshToken}`,
+        "X-Server-Refresh": "true",
+      },
+      timeout: 10000,
+    }
+  );
+
+  if (!response.data?.tokens?.accessToken) {
+    logger.error("Invalid refresh response structure", {
+      action: "token_refresh_failed",
+      error: "Missing tokens in response",
+    });
+    return {
+      ...token,
+      error: "RefreshAccessTokenError" as const,
+    };
+  }
+
+  const { accessToken } = response.data.tokens;
+
+  const setCookieHeader = response.headers["set-cookie"];
+  let newRefreshToken = token.refreshToken;
+
+  if (setCookieHeader) {
+    let refreshTokenCookie: string | undefined;
+
+    if (Array.isArray(setCookieHeader)) {
+      refreshTokenCookie = setCookieHeader.find((cookie) =>
+        cookie.startsWith("refreshToken=")
+      );
+    } else {
+      const cookieStr = setCookieHeader as string;
+      refreshTokenCookie = cookieStr.startsWith("refreshToken=")
+        ? cookieStr
+        : undefined;
+    }
+
+    if (refreshTokenCookie) {
+      const match = refreshTokenCookie.match(/refreshToken=([^;]+)/);
+      if (match) {
+        newRefreshToken = match[1];
+        logger.info("Refresh token rotated by backend", {
+          action: "token_refresh_rotated",
+        });
+      }
+    }
+  }
+
+  logger.info("Access token refreshed successfully", {
+    action: "token_refresh_success",
+  });
+
+  return {
+    ...token,
+    accessToken,
+    refreshToken: newRefreshToken,
+    accessTokenExpiry:
+      Date.now() + AUTH_COOKIE_CONFIG.ACCESS_TOKEN_MAX_AGE * 1000,
+    error: undefined,
+  };
+}
+
+/**
+ * Refreshes the access token with automatic deduplication.
+ * If a refresh is already in progress for this token, returns the existing promise.
+ * This prevents race conditions when multiple requests detect token expiry simultaneously.
+ */
 async function refreshAccessToken(token: JWT): Promise<JWT> {
   try {
     if (!token.refreshToken) {
@@ -24,77 +104,20 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
       };
     }
 
-    logger.info("Attempting to refresh access token", {
-      action: "token_refresh_attempt",
-    });
-
-    const response = await axios.post(
-      `${env.API_URL}/auth/refresh`,
-      {},
-      {
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": env.API_KEY,
-          Cookie: `refreshToken=${token.refreshToken}`,
-          "X-Server-Refresh": "true",
-        },
-        timeout: 10000,
-      }
-    );
-
-    if (!response.data?.tokens?.accessToken) {
-      logger.error("Invalid refresh response structure", {
-        action: "token_refresh_failed",
-        error: "Missing tokens in response",
+    // Check if a refresh is already in progress for this token
+    const existingRefresh = getCachedRefresh(token.refreshToken);
+    if (existingRefresh) {
+      logger.info("Refresh already in progress, returning cached promise", {
+        action: "token_refresh_deduplicated",
       });
-      return {
-        ...token,
-        error: "RefreshAccessTokenError" as const,
-      };
+      return await existingRefresh;
     }
 
-    const { accessToken } = response.data.tokens;
+    // Create and cache the refresh promise to deduplicate concurrent calls
+    const refreshPromise = performTokenRefresh(token);
+    setCachedRefresh(token.refreshToken, refreshPromise);
 
-    const setCookieHeader = response.headers["set-cookie"];
-    let newRefreshToken = token.refreshToken;
-
-    if (setCookieHeader) {
-      let refreshTokenCookie: string | undefined;
-
-      if (Array.isArray(setCookieHeader)) {
-        refreshTokenCookie = setCookieHeader.find((cookie) =>
-          cookie.startsWith("refreshToken=")
-        );
-      } else {
-        const cookieStr = setCookieHeader as string;
-        refreshTokenCookie = cookieStr.startsWith("refreshToken=")
-          ? cookieStr
-          : undefined;
-      }
-
-      if (refreshTokenCookie) {
-        const match = refreshTokenCookie.match(/refreshToken=([^;]+)/);
-        if (match) {
-          newRefreshToken = match[1];
-          logger.info("Refresh token rotated by backend", {
-            action: "token_refresh_rotated",
-          });
-        }
-      }
-    }
-
-    logger.info("Access token refreshed successfully", {
-      action: "token_refresh_success",
-    });
-
-    return {
-      ...token,
-      accessToken,
-      refreshToken: newRefreshToken,
-      accessTokenExpiry:
-        Date.now() + AUTH_COOKIE_CONFIG.ACCESS_TOKEN_MAX_AGE * 1000,
-      error: undefined,
-    };
+    return await refreshPromise;
   } catch (error) {
     const metadata: Record<string, unknown> = {};
 
@@ -295,10 +318,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         };
       }
 
-      // IMPORTANT: Check token expiry with buffer
-      // Refresh tokens proactively 30 seconds before they expire
       const expiryTime = token.accessTokenExpiry as number | undefined;
-      const REFRESH_BUFFER = 30 * 1000; // 30 seconds
+      const REFRESH_BUFFER = 5 * 60 * 1000; // 5 minutes in milliseconds
 
       if (expiryTime && Date.now() < expiryTime - REFRESH_BUFFER) {
         return token;

@@ -210,3 +210,13 @@ export type GetCurrentCompanyActionResult =
       success: false;
       error: string;
     };
+
+export type LogoutActionResult =
+  | {
+      success: true;
+      redirectUrl: string;
+    }
+  | {
+      success: false;
+      error: string;
+    };

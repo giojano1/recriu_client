@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { getErrorMessage } from "@/lib/api/api-error";
+import { logger } from "@/lib/utils/logger";
 import { createCompanyAction } from "./create-company.action";
 import { CreateCompanyActionResult } from "../shared/types";
 
@@ -17,13 +18,36 @@ export const useCreateCompany = () => {
       if (data.success) {
         toast.success("Company created successfully!");
 
-        // Update session with new companyId
-        await update({
-          companyId: data.companyId,
-        });
+        try {
+          // Update session with new companyId
+          await update({
+            companyId: data.companyId,
+          });
 
-        if (data.redirectUrl) {
-          router.push(data.redirectUrl);
+          // Small delay to ensure session propagation across server/client boundary
+          // This allows the session cookie to be set before navigation
+          await new Promise((resolve) => setTimeout(resolve, 100));
+
+          logger.info("Session updated with new companyId, navigating", {
+            action: "company_creation_navigation",
+            metadata: {
+              companyId: data.companyId,
+              redirectUrl: data.redirectUrl,
+            },
+          });
+
+          if (data.redirectUrl) {
+            router.push(data.redirectUrl);
+          }
+        } catch (error) {
+          logger.error("Failed to update session after company creation", {
+            action: "company_creation_session_update_failed",
+            error: error instanceof Error ? error.message : "Unknown error",
+          });
+
+          toast.error(
+            "Company created but session update failed. Please refresh the page."
+          );
         }
       } else {
         if (data.error) {

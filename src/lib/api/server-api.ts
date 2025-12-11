@@ -86,59 +86,6 @@ function isRefreshEndpoint(config: RetryConfig): boolean {
   return config.url?.includes("/auth/refresh") || false;
 }
 
-// NEW: Helper to manually refresh the session
-async function refreshSession(): Promise<string | null> {
-  try {
-    logger.info("Manually triggering token refresh", {
-      action: "manual_token_refresh",
-    });
-
-    // Get current session to extract refresh token
-    const currentSession = await auth();
-
-    if (!currentSession?.refreshToken) {
-      logger.error("No refresh token available for manual refresh", {
-        action: "manual_token_refresh_failed",
-      });
-      return null;
-    }
-
-    // Call refresh endpoint directly
-    const response = await axios.post(
-      `${env.API_URL}/auth/refresh`,
-      {},
-      {
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": env.API_KEY,
-          Cookie: `refreshToken=${currentSession.refreshToken}`,
-          "X-Server-Refresh": "true",
-        },
-        timeout: 10000,
-      }
-    );
-
-    if (!response.data?.tokens?.accessToken) {
-      logger.error("Invalid refresh response", {
-        action: "manual_token_refresh_failed",
-      });
-      return null;
-    }
-
-    logger.info("Token refreshed successfully", {
-      action: "manual_token_refresh_success",
-    });
-
-    return response.data.tokens.accessToken;
-  } catch (error) {
-    logger.error("Failed to manually refresh token", {
-      action: "manual_token_refresh_failed",
-      error: error instanceof Error ? error.message : "Unknown error",
-    });
-    return null;
-  }
-}
-
 // Response interceptor
 ServerAPI.interceptors.response.use(
   (response) => response,
@@ -162,31 +109,43 @@ ServerAPI.interceptors.response.use(
       !config.headers?.["X-No-Retry"] &&
       !config._isRetryAfter401 // Prevent infinite loops
     ) {
-      logger.info("Received 401, attempting token refresh", {
-        action: "server_api_401_refresh",
+      logger.info("Received 401, attempting to refresh session via NextAuth", {
+        action: "server_api_401_refresh_nextauth",
       });
 
-      // Try to refresh the token
-      const newAccessToken = await refreshSession();
+      try {
+        // Force NextAuth to re-evaluate session (triggers JWT callback if needed)
+        const freshSession = await auth();
 
-      if (newAccessToken) {
-        // Mark this as a retry after 401 to prevent infinite loops
-        config._isRetryAfter401 = true;
+        if (freshSession?.accessToken && !freshSession.error) {
+          // Mark this as a retry after 401 to prevent infinite loops
+          config._isRetryAfter401 = true;
 
-        // Update the Authorization header with new token
-        config.headers.Authorization = `Bearer ${newAccessToken}`;
+          // Update the Authorization header with fresh token from session
+          config.headers.Authorization = `Bearer ${freshSession.accessToken}`;
 
-        logger.info("Retrying request with new token", {
-          action: "server_api_retry_with_new_token",
+          logger.info("Retrying request with fresh session token", {
+            action: "server_api_retry_with_nextauth_token",
+          });
+
+          // Retry the request with new token
+          return ServerAPI(config);
+        } else {
+          logger.error("Session refresh failed or has error", {
+            action: "server_api_session_refresh_failed",
+            metadata: { hasError: freshSession?.error },
+          });
+          // Return 401 error to trigger sign out in client
+          return Promise.reject(error);
+        }
+      } catch (refreshError) {
+        logger.error("Failed to get fresh session", {
+          action: "server_api_session_fetch_failed",
+          error:
+            refreshError instanceof Error
+              ? refreshError.message
+              : "Unknown error",
         });
-
-        // Retry the request with new token
-        return ServerAPI(config);
-      } else {
-        logger.error("Token refresh failed, cannot retry request", {
-          action: "server_api_refresh_failed",
-        });
-        // Return 401 error to trigger sign out in client
         return Promise.reject(error);
       }
     }
