@@ -1,5 +1,4 @@
 "use client";
-
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -25,6 +24,7 @@ import {
   Loader2,
   LogOut,
 } from "lucide-react";
+import { toast } from "sonner";
 
 export default function User() {
   const { data, isLoading, error } = useGetCurrentUser();
@@ -36,7 +36,10 @@ export default function User() {
   };
 
   if (isLoading) return <div></div>;
-  if (error) return <div>Error loading user data</div>;
+  if (error) {
+    toast.error("Failed to load user data.");
+    return null;
+  }
   if (!data) return null;
   const user = data.user;
   return (
@@ -50,14 +53,15 @@ export default function User() {
               suppressHydrationWarning
             >
               <Avatar className="h-8 w-8 rounded-lg">
-                {/* <AvatarImage src={user.avatar} alt={user.name} /> */}
                 <AvatarFallback className="rounded-lg">
                   {user.firstName.charAt(0).toUpperCase()}
                   {user.lastName.charAt(0).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{user.firstName}</span>
+                <span className="truncate font-medium">
+                  {user.firstName} {user.lastName}
+                </span>
                 <span className="truncate text-xs">{user.email}</span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />

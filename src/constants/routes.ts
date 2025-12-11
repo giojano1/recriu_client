@@ -13,6 +13,8 @@ export const dashboardRoutes = {
   JOBS: "/dashboard/jobs",
   SETTINGS: "/dashboard/settings",
   ANALYTICS: "/dashboard/analytics",
+  CALENDAR: "/dashboard/calendar",
+  CAREER_PAGE: "/dashboard/career-page",
 };
 
 export const companyRoutes = {
