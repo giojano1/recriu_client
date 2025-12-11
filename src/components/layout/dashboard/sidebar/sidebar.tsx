@@ -12,7 +12,7 @@ import {
 import { navLinks } from "@/constants/nav-links";
 import { SquareTerminal } from "lucide-react";
 import * as React from "react";
-import User from "./user";
+import { PlanCard } from "./plan-card";
 const navLinksTwo = [
   {
     title: "Label One",
@@ -58,7 +58,7 @@ export function DashboardSidebar({
         <CollapsibleNavbar navLinks={navLinksTwo} label="Management" />
       </SidebarContent>
       <SidebarFooter>
-        <User />
+        <PlanCard />
       </SidebarFooter>
     </Sidebar>
   );
