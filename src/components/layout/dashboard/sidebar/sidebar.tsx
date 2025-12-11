@@ -31,7 +31,7 @@ export function DashboardSidebar({
         </SidebarMenuButton>
       </SidebarHeader>
       <SidebarContent>
-        <Navbar navLinks={navLinks} label="Main Navigation" />
+        <Navbar navLinks={navLinks} label="Main" />
       </SidebarContent>
       <SidebarFooter>
         <User />
