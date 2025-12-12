@@ -1,5 +1,5 @@
 "use client";
-import { Navbar } from "@/components/common/navbar";
+import { Navbar } from "@/components/common/sidebar/navbar";
 import Logo from "@/components/ui/logos/logo";
 import {
   Sidebar,
@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/sidebar";
 import { navLinks } from "@/constants/nav-links";
 import * as React from "react";
-import User from "./user";
+import User from "../../common/sidebar/user";
 
 export function DashboardSidebar({
   ...props

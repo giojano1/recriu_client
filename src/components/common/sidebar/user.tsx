@@ -19,8 +19,8 @@ import { useGetCurrentUser } from "@/features/user/get-current-user";
 import {
   BadgeCheck,
   Bell,
-  ChevronsUpDown,
   CreditCard,
+  EllipsisVertical,
   Loader2,
   LogOut,
 } from "lucide-react";
@@ -52,7 +52,7 @@ export default function User() {
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
               suppressHydrationWarning
             >
-              <Avatar className="h-8 w-8 rounded-lg">
+              <Avatar className="h-8 w-8 rounded-lg grayscale">
                 <AvatarFallback className="rounded-lg">
                   {user.firstName.charAt(0).toUpperCase()}
                   {user.lastName.charAt(0).toUpperCase()}
@@ -62,9 +62,11 @@ export default function User() {
                 <span className="truncate font-medium">
                   {user.firstName} {user.lastName}
                 </span>
-                <span className="truncate text-xs">{user.email}</span>
+                <span className="text-muted-foreground truncate text-xs">
+                  {user.email}
+                </span>
               </div>
-              <ChevronsUpDown className="ml-auto size-4" />
+              <EllipsisVertical className="ml-auto size-4" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent

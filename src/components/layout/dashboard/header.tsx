@@ -1,8 +1,8 @@
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import ThemeSwitch from "@/components/ui/toggle/theme-switch";
-import NotificationsBtn from "./notifications-btn";
-import PublicPageBtn from "./public-page-btn";
+import NotificationsBtn from "../../common/header/notifications-btn";
+import PublicPageBtn from "../../common/header/public-page-btn";
 
 export default function Header() {
   return (

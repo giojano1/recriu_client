@@ -24,7 +24,12 @@ export default function NotificationsBtn() {
           <Bell className="size-4" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-[350px]" align="start">
+      <DropdownMenuContent
+        className="w-full max-w-[350px] shadow-lg"
+        align="end"
+        alignOffset={0}
+        sideOffset={10}
+      >
         <DropdownMenuLabel>Notifications</DropdownMenuLabel>
         <DropdownMenuSeparator />
 
