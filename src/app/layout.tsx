@@ -4,6 +4,7 @@ import "@/styles/globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Toaster } from "sonner";
+import { UnhandledRejectionHandler } from "@/lib/error/unhandled-rejection-handler";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -39,6 +40,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={cn(inter.variable, "antialiased")}>
+        <UnhandledRejectionHandler />
         <QueryProvider>
           <ThemeProvider
             attribute="class"

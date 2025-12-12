@@ -115,11 +115,22 @@ export async function proxy(request: NextRequest) {
   const is2FARoute = pathname === ROUTE_CONFIG.TWO_FA_ROUTE;
 
   if (session?.error === "RefreshAccessTokenError") {
-    const response = redirectWithCallback(
-      ROUTE_CONFIG.DEFAULT_LOGOUT_REDIRECT,
-      request,
-      isProtectedRoute // Only preserve callback for protected routes
-    );
+    // Create login URL with session expiry notification
+    const loginUrl = new URL(ROUTE_CONFIG.DEFAULT_LOGOUT_REDIRECT, request.url);
+    loginUrl.searchParams.set('reason', 'session_expired');
+
+    // Preserve callback URL for protected routes
+    if (isProtectedRoute) {
+      const currentPath = request.nextUrl.pathname;
+      const currentSearch = request.nextUrl.search;
+      const callbackUrl = `${currentPath}${currentSearch}`;
+
+      if (currentPath !== ROUTE_CONFIG.DEFAULT_LOGOUT_REDIRECT) {
+        loginUrl.searchParams.set("callbackUrl", callbackUrl);
+      }
+    }
+
+    const response = NextResponse.redirect(loginUrl);
 
     // Clear all auth cookies to force fresh login
     return clearAuthCookies(response);

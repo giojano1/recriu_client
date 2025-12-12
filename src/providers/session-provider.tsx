@@ -16,8 +16,8 @@ export function AuthSessionProvider({
   return (
     <SessionProvider
       session={session}
-      refetchInterval={5 * 60}
-      refetchOnWindowFocus={true}
+      refetchInterval={0}           // Disable - JWT callback handles refresh
+      refetchOnWindowFocus={false}  // Disable - reduces unnecessary refetch attempts
     >
       {children}
     </SessionProvider>

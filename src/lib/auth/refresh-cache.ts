@@ -37,6 +37,13 @@ export function setCachedRefresh(
 ): void {
   refreshPromiseCache.set(refreshToken, promise);
 
+  // Attach catch handler to prevent unhandled rejections
+  // The actual error handling happens in consumers via try-catch
+  // This prevents browser warnings about unhandled rejections
+  promise.catch(() => {
+    // No-op: errors are properly handled by awaiting code in refreshAccessToken()
+  });
+
   // Auto-cleanup: Remove from cache when promise settles (success or failure)
   promise.finally(() => {
     refreshPromiseCache.delete(refreshToken);
