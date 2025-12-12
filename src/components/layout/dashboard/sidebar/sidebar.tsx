@@ -16,22 +16,23 @@ export function DashboardSidebar({
   ...props
 }: React.ComponentProps<typeof Sidebar>) {
   return (
-    <Sidebar {...props}>
-      <SidebarHeader className="h-14 border-b">
+    <Sidebar collapsible="offcanvas" {...props}>
+      <SidebarHeader>
         <SidebarMenuButton
           size="lg"
           asChild
-          className="hover:bg-transparent active:bg-transparent"
+          className="data-[slot=sidebar-menu-button]:p-1.5!"
         >
           <div>
             <Logo size="sm" />
-            <span className="text-lg font-bold">Recriu</span>
+            <span className="text-base font-semibold">Recriu</span>
           </div>
         </SidebarMenuButton>
       </SidebarHeader>
       <SidebarContent>
-        <Navbar navLinks={navLinks.main} label="Main" />
+        <Navbar navLinks={navLinks.main} />
         <Navbar navLinks={navLinks.management} label="Management" />
+        <Navbar navLinks={navLinks.secondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
         <User />

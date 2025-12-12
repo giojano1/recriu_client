@@ -1,4 +1,5 @@
 import {
+  BadgeQuestionMark,
   Briefcase,
   Calendar,
   ChartLine,
@@ -32,27 +33,34 @@ export const navLinks = {
       url: dashboardRoutes.CALENDAR,
       icon: Calendar,
     },
-  ],
-  management: [
-    {
-      name: "Employees",
-      url: dashboardRoutes.ANALYTICS,
-      icon: Users,
-    },
     {
       name: "Analytics",
       url: dashboardRoutes.ANALYTICS,
       icon: ChartLine,
     },
+  ],
+  management: [
     {
-      name: "Career Page",
+      name: "Team",
+      url: dashboardRoutes.TEAM,
+      icon: Users,
+    },
+    {
+      name: "Careers Page",
       url: dashboardRoutes.CAREER_PAGE,
       icon: Globe,
     },
+  ],
+  secondary: [
     {
       name: "Settings",
       url: dashboardRoutes.SETTINGS,
       icon: Settings,
+    },
+    {
+      name: "Get Help",
+      url: dashboardRoutes.SETTINGS,
+      icon: BadgeQuestionMark,
     },
   ],
 };

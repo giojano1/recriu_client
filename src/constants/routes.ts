@@ -15,6 +15,7 @@ export const dashboardRoutes = {
   ANALYTICS: "/dashboard/analytics",
   CALENDAR: "/dashboard/calendar",
   CAREER_PAGE: "/dashboard/career-page",
+  TEAM: "/dashboard/team",
 };
 
 export const companyRoutes = {
