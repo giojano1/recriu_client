@@ -1,5 +1,4 @@
 "use client";
-import { type LucideIcon } from "lucide-react";
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -7,13 +6,15 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { cn } from "@/lib/utils/utils";
+import { type LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils/utils";
 
 export function Navbar({
   navLinks,
   label,
+  ...props
 }: {
   navLinks: {
     name: string;
@@ -21,10 +22,10 @@ export function Navbar({
     icon: LucideIcon;
   }[];
   label?: string;
-}) {
+} & React.ComponentPropsWithoutRef<typeof SidebarGroup>) {
   const pathname = usePathname();
   return (
-    <SidebarGroup className="group-data-[collapsible=icon]:hidden">
+    <SidebarGroup className="group-data-[collapsible=icon]:hidden" {...props}>
       {label && <SidebarGroupLabel>{label}</SidebarGroupLabel>}
       <SidebarMenu>
         {navLinks.map((item) => {
@@ -33,7 +34,10 @@ export function Navbar({
             <SidebarMenuItem key={item.name}>
               <SidebarMenuButton
                 asChild
-                className={cn(isActive && "bg-accent")}
+                className={cn(
+                  isActive &&
+                    "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear"
+                )}
               >
                 <Link href={item.url}>
                   <item.icon />

@@ -6,10 +6,10 @@ import PublicPageBtn from "./public-page-btn";
 
 export default function Header() {
   return (
-    <header className="bg-sidebar border-sidebar-border sticky top-0 flex h-14 shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+    <header className="flex h-(--header-height) shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)">
       <div className="flex w-full items-center justify-between gap-2 px-4">
         <div className="flex items-center gap-2">
-          <SidebarTrigger className="-ml-2" />
+          <SidebarTrigger className="-ml-1" />
         </div>
         <div className="flex items-center gap-2">
           <PublicPageBtn className="hidden md:flex" />
