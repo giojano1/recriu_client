@@ -13,77 +13,111 @@ import type { JWT } from "next-auth/jwt";
 import { getCachedRefresh, setCachedRefresh } from "./refresh-cache";
 
 async function performTokenRefresh(token: JWT): Promise<JWT> {
-  logger.info("Attempting to refresh access token", {
-    action: "token_refresh_attempt",
-  });
-
-  const response = await axios.post(
-    `${env.API_URL}/auth/refresh`,
-    {},
-    {
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": env.API_KEY,
-        Cookie: `refreshToken=${token.refreshToken}`,
-        "X-Server-Refresh": "true",
+  try {
+    logger.info("Attempting to refresh access token", {
+      action: "token_refresh_attempt",
+      metadata: {
+        hasRefreshToken: !!token.refreshToken,
       },
-      timeout: 10000,
-    }
-  );
-
-  if (!response.data?.tokens?.accessToken) {
-    logger.error("Invalid refresh response structure", {
-      action: "token_refresh_failed",
-      error: "Missing tokens in response",
     });
+
+    const response = await axios.post(
+      `${env.API_URL}/auth/refresh`,
+      {},
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": env.API_KEY,
+          Cookie: `refreshToken=${token.refreshToken}`,
+          "X-Server-Refresh": "true",
+        },
+        timeout: 10000,
+      }
+    );
+
+    if (!response.data?.tokens?.accessToken) {
+      logger.error("Invalid refresh response structure", {
+        action: "token_refresh_failed",
+        error: "Missing tokens in response",
+      });
+      return {
+        ...token,
+        error: "RefreshAccessTokenError" as const,
+      };
+    }
+
+    const { accessToken } = response.data.tokens;
+
+    const setCookieHeader = response.headers["set-cookie"];
+    let newRefreshToken = token.refreshToken;
+
+    if (setCookieHeader) {
+      let refreshTokenCookie: string | undefined;
+
+      if (Array.isArray(setCookieHeader)) {
+        refreshTokenCookie = setCookieHeader.find((cookie) =>
+          cookie.startsWith("refreshToken=")
+        );
+      } else {
+        const cookieStr = setCookieHeader as string;
+        refreshTokenCookie = cookieStr.startsWith("refreshToken=")
+          ? cookieStr
+          : undefined;
+      }
+
+      if (refreshTokenCookie) {
+        const match = refreshTokenCookie.match(/refreshToken=([^;]+)/);
+        if (match) {
+          newRefreshToken = match[1];
+          logger.info("Refresh token rotated by backend", {
+            action: "token_refresh_rotated",
+          });
+        }
+      }
+    }
+
+    logger.info("Access token refreshed successfully", {
+      action: "token_refresh_success",
+      metadata: {
+        hasSetCookie: !!setCookieHeader,
+      },
+    });
+
+    return {
+      ...token,
+      accessToken,
+      refreshToken: newRefreshToken,
+      accessTokenExpiry:
+        Date.now() + AUTH_COOKIE_CONFIG.ACCESS_TOKEN_MAX_AGE * 1000,
+      error: undefined,
+    };
+  } catch (error) {
+    // Comprehensive error logging
+    if (axios.isAxiosError(error)) {
+      logger.error("Failed to refresh access token", {
+        action: "token_refresh_failed",
+        error: error.message,
+        metadata: {
+          status: error.response?.status,
+          statusText: error.response?.statusText,
+          code: error.code,
+          url: error.config?.url,
+          responseData: JSON.stringify(error.response?.data),
+        },
+      });
+    } else {
+      logger.error("Unexpected error during token refresh", {
+        action: "token_refresh_unexpected_error",
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+
+    // Always return error token, never throw
     return {
       ...token,
       error: "RefreshAccessTokenError" as const,
     };
   }
-
-  const { accessToken } = response.data.tokens;
-
-  const setCookieHeader = response.headers["set-cookie"];
-  let newRefreshToken = token.refreshToken;
-
-  if (setCookieHeader) {
-    let refreshTokenCookie: string | undefined;
-
-    if (Array.isArray(setCookieHeader)) {
-      refreshTokenCookie = setCookieHeader.find((cookie) =>
-        cookie.startsWith("refreshToken=")
-      );
-    } else {
-      const cookieStr = setCookieHeader as string;
-      refreshTokenCookie = cookieStr.startsWith("refreshToken=")
-        ? cookieStr
-        : undefined;
-    }
-
-    if (refreshTokenCookie) {
-      const match = refreshTokenCookie.match(/refreshToken=([^;]+)/);
-      if (match) {
-        newRefreshToken = match[1];
-        logger.info("Refresh token rotated by backend", {
-          action: "token_refresh_rotated",
-        });
-      }
-    }
-  }
-
-  logger.info("Access token refreshed successfully", {
-    action: "token_refresh_success",
-  });
-
-  return {
-    ...token,
-    accessToken,
-    refreshToken: newRefreshToken,
-    accessTokenExpiry:
-      Date.now() + AUTH_COOKIE_CONFIG.ACCESS_TOKEN_MAX_AGE * 1000,
-    error: undefined,
-  };
 }
 
 /**
